@@ -1,0 +1,612 @@
+package apprentiGuitariste;
+/*
+ * @author: Ralph Kobersy et Andrew Kobersy
+ * @version: H2020
+ * @date: 2020-02-07
+ * 
+ * Ceci est un programme qui permet au futur guitariste d'apprendre a jouer de 
+ * la guitare. Grace a ce programme, vous aurez le choix de choisir entre 2 
+ * menus differents, un menu de note qui vous montre sur quelles frettes 
+ * se situent la note choisie ainsi qu'un menu de gamme qui vous montre ou sont 
+ * situer toutes les notes selon la gamme choisie (majeure ou mineure).
+ * Amusez-vous et bonne pratique :)
+ */
+import java.util.Scanner;
+
+public class main {
+	
+	public static Scanner clavier = new Scanner(System.in);
+		
+		//Declaration et initialisation des differentes notes
+		public static final int DO =1;
+		public static final int DO_DIESE=2;
+		public static final int RE=3;
+		public static final int RE_DIESE=4;
+		public static final int MI=5;
+		public static final int FA=6;
+		public static final int FA_DIESE=7;
+		public static final int SOL=8;
+		public static final int SOL_DIESE=9;
+		public static final int LA=10;
+		public static final int LA_DIESE=11;
+		public static final int SI=12;
+		public static final int QUITTER_MENU_NOTE=13;
+		public static final int QUITTER_MENU_PRINCIPAL=3;
+		public static final int QUITTER_MENU_GAMME=3;
+		
+		//Declaration et initialisation des intervalles
+		public static final int DEMI_TON=1;
+		public static final int TON=2;
+		
+		public static final int MAJEURE=1;
+		public static final int MINEURE=2;
+		
+		//Declaration et initialisation des messages
+		public static final String MSG_SOL_CHOIX="Entrez votre choix svp : ";
+		public static final String MSG_FIN= "Merci a la prochaine ";
+		public static final String EFFACER_ECRAN="\n\n\n\n\n\n\n\n\n\n\n\n\n"
+												+ "\n\n\n\n\n\n\n\n\n\n\n\n\n"
+												+ "\n\n\n\n\n\n\n\n\n\n\n\n\n"
+												+ "\n\n\n\n\n\n\n\n\n\n\n\n\n"
+												+ "\n\n\n\n";
+		
+		/*
+		 * Initialisation des constantes pour le manche de guitare
+		 */
+		public static final int NOMBRES_FRETTES=25;
+		public static final int NOMBRES_CORDES=6;
+		
+		/*
+		 * Initialisation du declage pour le menu note
+		 */
+		public static final int DECALAGE_FRETTE=12;
+		
+		public static final int MENU_NOTE=1;
+		public static final int MENU_GAMME=2;
+		
+		public static final int TYPE_MAJEURE=0;
+		public static final int TYPE_MINEURE=1;
+	
+		public static void main(String[]args) {
+			
+			/*
+			 * Declaration et initialisation du tableau des 1er frettes et
+			 * initialisation du tableau de gamme.
+			 */
+			int [][]tabFrette={{8,1,5,10,3,8},{9,2,6,11,4,9}
+									,{10,3,7,0,5,10},{11,4,8,1,6,11}
+									,{0,5,9,2,7,0},{1,6,10,3,8,1}
+									,{2,7,11,4,9,2},{3,8,0,5,10,3}
+									,{4,9,1,6,11,4},{5,10,2,7,0,5}
+									,{6,11,3,8,1,6},{7,0,4,9,2,7}};
+			
+			/*
+			 * Initialisation du tableau des gammes (majeure sur la 1er ligne 
+			 * et mineure sur la 2e)
+			 */
+			int [][]TAB_GAMME= {{TON,TON,DEMI_TON,TON,TON,TON,DEMI_TON},
+			           {TON,DEMI_TON,TON,TON,DEMI_TON,TON,TON}};
+			
+			/*
+			 * Initialisation du tableau booleen pour le manche de guitare
+			 */
+			boolean [][]tabMancheGuitare;
+			tabMancheGuitare=new boolean [6][25];
+			
+			/*
+			 * Initialisation du tableau pour le menu principal
+			 */
+			String []menuPrincipal= {"Menu Principal","1. Menu de note",
+								"2. Menu de gamme","3. Quitter"};
+			
+			/*
+			 * Tableau pour le menu des notes
+			 */
+			String []menuNote= {"1. DO","2. DO_DIESE","3. RE","4. RE_DIESE",
+								"5. MI","6. FA","7. FA_DIESE","8. SOL",
+								"9. SOL_DIESE","10. LA","11. LA_DIESE",
+								"12. SI","13. Quitter"};
+			
+			/*
+			 * Tableau pour le menu des gammes
+			 */
+			String []menuGamme={"1. Majeure","2. Mineure","3. Quitter"};
+					
+			/*
+			 * Variable qui permet de choisir dans le menu
+			 */
+			int choix;
+			
+			/*
+			 * Debut de la boucle pour les menus
+			 */
+			do {
+				
+				choix= MenuPrincipal(menuPrincipal);
+			
+				/*
+				 * Menu principal
+				 */
+				switch(choix) {
+				
+				/*
+				 * Menu note
+				 */
+				case MENU_NOTE:
+					
+					menuNote(menuNote,tabMancheGuitare,tabFrette);
+					
+					break;
+				
+				case MENU_GAMME:
+					
+					menuGamme(menuNote,menuGamme,tabMancheGuitare,tabFrette
+							,TAB_GAMME);
+					
+					break;
+				
+				case QUITTER_MENU_PRINCIPAL:
+						
+					/*
+					 * Affichage du message de fin
+					 */
+					afficherMessageFin(MSG_FIN);
+						
+					break;
+						
+					}
+						
+						/*
+						 * Saut de ligne
+						 */
+						System.out.println();
+				
+					}while(choix!=QUITTER_MENU_PRINCIPAL);
+				
+	}
+		/*
+		 * Procedure qui permet d'afficher les menus
+		 * @param Menu
+		 */
+		public static void afficherMenu(String []menu) {
+			
+			/*
+			 * Tant que le tableau n'a pas ete parcouru
+			 */
+			for(int i=0;i<menu.length;++i) {
+				
+				/*
+				 * Affiche le contenu de la case
+				 */
+				System.out.println(menu[i]);
+			}
+			
+		}
+		/*
+		 * Procedure qui met des faux dans tout le manche de la guitare
+		 * @param Manche de guitare
+		 */
+		public static void initAzeroMancheGuitare(boolean [][]tabManche) {
+			
+			int i; //Iterateur pour les cordes
+			
+			int j; //Iterateur pour les frettes
+			
+			/*
+			 * Bouble tant que les cordes soient toutes remplies
+			 */
+			for(i=0;i<main.NOMBRES_CORDES;++i) {
+				
+				/*
+				 * Bouble tant que les frettes ne sont pas toutes parcourues
+				 */
+				for(j=0;j<main.NOMBRES_FRETTES;++j) {
+					
+					/*
+					 * Si la valeur de la case est vraie
+					 */
+					if(tabManche[i][j]==true) {
+						
+						/*
+						 * Remet a faux les cases qui sont a vraies
+						 */
+						tabManche[i][j]=false;
+					}
+				}
+			}
+			
+		
+		}
+		/*
+		 *Procedure qui permet d'afficher la note sur le manche de guitare
+		 *@param Manche de guitare
+		 *@param Tableau des frettes
+		 *@param Note choisie
+		 */
+		public static void placerNoteSurManche(boolean [][]tabManche
+											,int [][]tabFrettes,int note){
+			
+			/*
+			 * Initialisation d'un iterateur
+			 */
+			int i; //Iterateur pour les lignes
+			
+			int j; // Iterateur pour les colonnes
+			
+			/*
+			 * Bouble qui parcourt chaque ligne
+			 */
+			for(i=0;i<NOMBRES_CORDES;++i) {
+				/*
+				 * Bouble qui parcourt chaque colonne
+				 */
+				for(j=0;j<NOMBRES_FRETTES;j+=DECALAGE_FRETTE) {
+					
+					
+					/*
+					 * Pemret de mettre des vrais lorsque la position
+					 * des frettes  correspond a la note choisie
+					 */
+					if(tabFrettes[note-1][i]+j<NOMBRES_FRETTES) {
+						
+						tabManche[i][tabFrettes[note-1][i]
+								+j]=true;
+					}
+					
+				
+						
+
+				}
+				
+			}
+		}
+		/*
+		 * Procedure qui affiche le message de fin
+		 * @param message de fin
+		 */
+		public static void afficherMessageFin(String message) {
+			
+			/*
+			 * Affichage du message
+			 */
+			System.out.print(message);
+		}
+		
+		/*
+		 * Procedure qui montre la note majeure choisie sur le mancge de guitare
+		 * @param Manche de guitare
+		 * @param Tableau des frettes
+		 * @param Tableau des gammes
+		 * @param note choisie
+		 * @param Type de gamme
+		 */
+		public static void placerGamme(boolean [][]tabManche
+										,int [][]tabFrettes,int [][]TAB_GAMME
+										,int note,int typeGamme) {
+		
+			/*
+			 * Boucle tant qu'il n'a pas afficher tous les tons
+			 */
+			for(int i=0;i<TAB_GAMME[typeGamme-1].length;++i) {
+				
+				/*
+				 * Place la note sur le manche
+				 */
+				placerNoteSurManche(tabManche,tabFrettes,note);
+				
+				/*
+				 * Change de note selon le ton de la gamme
+				 */
+				note=((((note) +TAB_GAMME[typeGamme-1][i])-1)%12)+1;
+				
+				
+			}
+			
+		}
+		/*
+		 * Procedure qui permet d'effacer la console
+		 * @param Tableau de string pour effacer l'ecran de la console
+		 */
+		public static void effacerEcran(String effacerEcran){
+			
+			/*
+			 * Effectue plusieurs sauts de lignes
+			 */
+			System.out.print(effacerEcran);
+			
+		}
+		/*
+		 * Procedure qui permet d'afficher le manche de guitare
+		 * @param Manche de guitare
+		 */
+		public static void afficherMancheGuitare(boolean [][]tabManche) {
+			
+			/*
+			 * Boucle qui parcourt toutes les cordes du manche du guitare
+			 */
+			for(int i=0;i<NOMBRES_CORDES;++i) {
+				
+				/*
+				 * Si la corde a vide est vraie
+				 */
+				if(tabManche[i][0]==true) {
+					
+					/*
+					 * Affiche un 0 avant le numero de la corde
+					 */
+					System.out.print("0"+ (i+1)+"|");
+				
+				/*
+				 * Si la corde a vide est a faux
+				 */
+				}else {
+					
+					/*
+					 * Affiche seulement le numero de la corde
+					 */
+					System.out.print(" "+ (i+1)+"|");
+				}
+			
+				/*
+				 * Boucle qui parcourt les frettes du manche de guitare
+				 */
+				for(int j=1;j<NOMBRES_FRETTES;++j) {
+					
+					/*
+					 * Si la case est vraie
+					 */
+					if(tabManche[i][j]==true) {
+						
+						/*
+						 * Affiche le numero de la frette
+						 */
+						System.out.printf("  "+"%2d|",j);
+					}
+					
+					/*
+					 * N'affiche pas la position de la frette si elle est fausse
+					 */
+					else {
+						
+						/*
+						 * Affiche des barres si c'est faux 
+						 */
+						System.out.printf("____"+"|");
+					}
+					
+				}
+				/*
+				 * Saut de ligne
+				 */
+				System.out.println();
+				
+			}
+			
+		}
+		/*
+		 * Procedure du menu pour les notes
+		 * @param Menu des Notes
+		 * @param Tableau du manche de guitare
+		 * @param Tableau des premieres occurences sur chaque cordes
+		 */
+		public static void menuNote(String[] menuNote
+									,boolean[][] tabMancheGuitare
+									,int[][] tabFrette) {
+			
+			/*
+			 * Initialisation du choix pour le menu note
+			 */
+			int choixMenuNote;
+			
+			/*
+			 * Tant que l'utilisateur n'a pas quitter le menu
+			 */
+			do {
+				
+				effacerEcran(EFFACER_ECRAN);
+				
+				/*
+				 * Affichage du menu note
+				 */
+				afficherMenu(menuNote);
+				
+				/*
+				 * Saisie et validation du choix de l'utilisateur
+				 */
+				choixMenuNote=UtilitaireValidation.lireInt
+													(MSG_SOL_CHOIX
+													,DO
+													,QUITTER_MENU_NOTE);
+				
+				/*
+				 * Si l'utilisateur n'a pas quitter
+				 */
+				if(choixMenuNote!=QUITTER_MENU_NOTE) {
+					
+					/*
+					 * Initialisation du manche de guitare avec des faux
+					 * et affichage de la note sur le manche de guitare
+					 * selon la note choisie
+					 */
+					initAzeroMancheGuitare(tabMancheGuitare);
+					
+					/*
+					 * Permet d'effacer l'ecran
+					 */
+					effacerEcran(EFFACER_ECRAN);
+					
+					/*
+					 * Permet de placer une note sur le manche
+					 */
+					placerNoteSurManche(tabMancheGuitare,tabFrette,
+										choixMenuNote);
+					
+					/*
+					 * Affichage du manche de guitare
+					 */
+					afficherMancheGuitare(tabMancheGuitare);
+					
+					/*
+					 * Laisse une pause a l'utilisateur
+					 */
+					UtilitaireValidation.pause();
+					
+				}
+
+			/*
+			 * Condition de fin 	
+			 */
+			}while(choixMenuNote != QUITTER_MENU_NOTE);
+			
+		}
+		
+		/*
+		 * Procedure du menu des gammes
+		 * @param Menu des Notes
+		 * @param Menu des gammes
+		 * @param Manche de guitare
+		 * @param Tableau des 1er occurences sur chaque cordes
+		 * @param Tableau pour la gamme majeure et mineure
+		 */
+		public static void menuGamme(String[] menuNote,String[] menuGamme
+									,boolean[][] tabMancheGuitare
+									,int[][] tabFrette
+									,int[][] TAB_GAMME) {
+			
+			/*/
+			 * variable pour la saisie du choix pour le  menu des notes
+			 * et des gammes.
+			 */
+			int choixMenuGamme;
+			
+			int choixDeLaNote;
+			
+			do {
+				
+				/*
+				 * Efface la console
+				 */
+				effacerEcran(EFFACER_ECRAN);
+				
+				/*
+				 * Affichage du menu des notes
+				 */
+				afficherMenu(menuNote);
+				
+				/*
+				 * Valider le choix de l'utilisateur
+				 */
+				choixDeLaNote=UtilitaireValidation.lireInt(
+													MSG_SOL_CHOIX,
+													DO, 
+													QUITTER_MENU_NOTE);
+				
+				if(choixDeLaNote!=QUITTER_MENU_NOTE) {
+					
+					/*
+					 * Efface la console
+					 */
+					effacerEcran(EFFACER_ECRAN);
+					
+					/*
+					 * Affichage du menu gamme et saisie du choix de 
+					 * l'utilisateur pour les gammes 
+					 */
+					afficherMenu(menuGamme);
+					
+					/*
+					 * Validation du choix de l'utilisateur
+					 */
+					choixMenuGamme=UtilitaireValidation.lireInt(
+													MSG_SOL_CHOIX,
+													MAJEURE, 
+													QUITTER_MENU_GAMME);
+					
+					/*
+					 * Si l'utilisateur a decide de ne pas quitter
+					 */
+					if(choixMenuGamme!=QUITTER_MENU_GAMME) {
+						
+						/*
+						 * Si il choisi la gamme majeure
+						 */
+						if(choixMenuGamme==MAJEURE) {
+							
+							/*
+							 * Initialise le manche avec des faux
+							 */
+							initAzeroMancheGuitare(tabMancheGuitare);
+							
+							effacerEcran(EFFACER_ECRAN);
+							
+							/*
+							 * Place les gammes sur le manche de guitare
+							 */
+							placerGamme(tabMancheGuitare,tabFrette,
+										TAB_GAMME,choixDeLaNote
+										,MAJEURE);
+							
+							/*
+							 * Affichage du manche de guitare
+							 */
+							afficherMancheGuitare(tabMancheGuitare);
+							
+							UtilitaireValidation.pause();
+							
+							/*
+							 * Si l'utilisateur choisi la gamme mineure
+							 */
+						}else {
+							
+							/*
+							 * Initialise le manche de guitare avec des 
+							 * faux
+							 */
+							initAzeroMancheGuitare(tabMancheGuitare);
+							
+							effacerEcran(EFFACER_ECRAN);
+							
+							placerGamme(tabMancheGuitare,tabFrette,
+										TAB_GAMME,choixDeLaNote
+										,MINEURE);
+							
+							
+							afficherMancheGuitare(tabMancheGuitare);
+							
+							UtilitaireValidation.pause();
+							
+						}
+						
+					}
+					
+				}
+				
+			}while(choixDeLaNote!=QUITTER_MENU_NOTE);
+				
+		}
+		
+		/*/
+		 * Procedure qui permet de permettre la saisie du choix dans le
+		 * menu principal
+		 * @param Menu principal
+		 */
+		
+		public static int MenuPrincipal(String[] menuPrincipal) {
+			
+			int choix;
+			/*
+			 * Affichage du menu principale
+			 */
+			afficherMenu(menuPrincipal);
+			
+			/*
+			 * Permet d'enregistrer le choix de l'utilisateur
+			 */
+			choix=UtilitaireValidation.lireInt(MSG_SOL_CHOIX, MENU_NOTE
+												,QUITTER_MENU_NOTE);
+			
+			return choix;
+	
+		}
+		
+	}
